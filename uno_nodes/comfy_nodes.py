@@ -109,6 +109,8 @@ def custom_load_ae(ae_path, device):
 def custom_load_t5(device: str | torch.device = "cuda", max_length: int = 512) -> HFEmbedder:
     # max length 64, 128, 256 and 512 should work (if your sequence is short enough)
     version = "xlabs-ai/xflux_text_encoders"
+    if os.path.exists("/stable-diffusion-cache/models/clip/xflux_text_encoders"):
+        version = "/stable-diffusion-cache/models/clip/xflux_text_encoders"
     cache_dir = folder_paths.get_folder_paths("clip")[0]
     return HFEmbedder(version, max_length=max_length, torch_dtype=torch.bfloat16, cache_dir=cache_dir).to(device)
 
