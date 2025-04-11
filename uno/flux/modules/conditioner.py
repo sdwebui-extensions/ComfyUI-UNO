@@ -14,8 +14,6 @@
 # limitations under the License.
 
 from torch import Tensor, nn
-from transformers import (CLIPTextModel, CLIPTokenizer, T5EncoderModel,
-                          T5Tokenizer)
 
 
 class HFEmbedder(nn.Module):
@@ -24,6 +22,8 @@ class HFEmbedder(nn.Module):
         self.is_clip = "clip" in version.lower()
         self.max_length = max_length
         self.output_key = "pooler_output" if self.is_clip else "last_hidden_state"
+        from transformers import (CLIPTextModel, CLIPTokenizer, T5EncoderModel,
+                          T5Tokenizer)
 
         if self.is_clip:
             self.tokenizer: CLIPTokenizer = CLIPTokenizer.from_pretrained(version, max_length=max_length, **hf_kwargs)

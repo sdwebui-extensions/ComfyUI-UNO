@@ -1,4 +1,4 @@
-from .nodes.comfy_nodes import UNOModelLoader, UNOGenerate
+from .uno_nodes.comfy_nodes import UNOModelLoader, UNOGenerate
 
 
 # 注册节点

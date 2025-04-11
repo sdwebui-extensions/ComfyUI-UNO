@@ -11,12 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from comfy.model_management import get_torch_device
 import folder_paths
 
-from uno.flux.model import Flux
 from uno.flux.modules.conditioner import HFEmbedder
-from uno.flux.pipeline import UNOPipeline, preprocess_ref
-from uno.flux.util import configs, print_load_warning, set_lora
-from uno.flux.modules.layers import DoubleStreamBlockLoraProcessor, SingleStreamBlockLoraProcessor, DoubleStreamBlockProcessor, SingleStreamBlockProcessor
-from safetensors.torch import load_file as load_sft
 
 
 # 添加自定义加载模型的函数
@@ -26,6 +21,8 @@ def custom_load_flux_model(model_path, device, use_fp8, lora_rank=512, lora_path
     """
     from uno.flux.model import Flux
     from uno.flux.util import load_model
+    from uno.flux.util import configs, print_load_warning, set_lora
+    from safetensors.torch import load_file as load_sft
     
     if use_fp8:
         params = configs["flux-dev-fp8"].params
@@ -82,6 +79,8 @@ def custom_load_ae(ae_path, device):
     """
     from uno.flux.modules.autoencoder import AutoEncoder
     from uno.flux.util import load_model
+    from uno.flux.util import configs
+    from safetensors.torch import load_file as load_sft
     
     # 获取对应模型类型的自编码器参数
     ae_params = configs["flux-dev"].ae_params
@@ -115,6 +114,8 @@ def custom_load_t5(device: str | torch.device = "cuda", max_length: int = 512) -
 
 def custom_load_clip(device: str | torch.device = "cuda") -> HFEmbedder:
     version = "openai/clip-vit-large-patch14"
+    if os.path.exists("/stable-diffusion-cache/models/clip/clip-vit-large-patch14"):
+        version = "/stable-diffusion-cache/models/clip/clip-vit-large-patch14"
     cache_dir = folder_paths.get_folder_paths("clip")[0]
     return HFEmbedder(version, max_length=77, torch_dtype=torch.bfloat16, cache_dir=cache_dir).to(device)
 
@@ -152,6 +153,7 @@ class UNOModelLoader:
 
     def load_model(self, flux_model, ae_model, use_fp8, offload, lora_model=None):
         device = get_torch_device()
+        from uno.flux.pipeline import UNOPipeline
         
         try:
             # 获取模型文件的完整路径
@@ -247,6 +249,7 @@ class UNOGenerate:
         # Make sure width and height are multiples of 16
         width = (width // 16) * 16
         height = (height // 16) * 16
+        from uno.flux.pipeline import preprocess_ref
         
         # Process reference images if provided
         ref_imgs = []
