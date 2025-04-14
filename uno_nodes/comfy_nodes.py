@@ -111,15 +111,17 @@ def custom_load_t5(device: str | torch.device = "cuda", max_length: int = 512) -
     version = "xlabs-ai/xflux_text_encoders"
     if os.path.exists("/stable-diffusion-cache/models/clip/xflux_text_encoders"):
         version = "/stable-diffusion-cache/models/clip/xflux_text_encoders"
+        return HFEmbedder(version, max_length=max_length, is_clip=False, torch_dtype=torch.bfloat16).to(device)
     cache_dir = folder_paths.get_folder_paths("clip")[0]
-    return HFEmbedder(version, max_length=max_length, torch_dtype=torch.bfloat16, cache_dir=cache_dir).to(device)
+    return HFEmbedder(version, max_length=max_length, is_clip=False, torch_dtype=torch.bfloat16, cache_dir=cache_dir).to(device)
 
 def custom_load_clip(device: str | torch.device = "cuda") -> HFEmbedder:
     version = "openai/clip-vit-large-patch14"
     if os.path.exists("/stable-diffusion-cache/models/clip/clip-vit-large-patch14"):
         version = "/stable-diffusion-cache/models/clip/clip-vit-large-patch14"
+        return HFEmbedder(version, max_length=77, is_clip=True, torch_dtype=torch.bfloat16).to(device)
     cache_dir = folder_paths.get_folder_paths("clip")[0]
-    return HFEmbedder(version, max_length=77, torch_dtype=torch.bfloat16, cache_dir=cache_dir).to(device)
+    return HFEmbedder(version, max_length=77, is_clip=True, torch_dtype=torch.bfloat16, cache_dir=cache_dir).to(device)
 
 
 

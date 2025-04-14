@@ -17,9 +17,9 @@ from torch import Tensor, nn
 
 
 class HFEmbedder(nn.Module):
-    def __init__(self, version: str, max_length: int, **hf_kwargs):
+    def __init__(self, version: str, max_length: int, is_clip=True, **hf_kwargs):
         super().__init__()
-        self.is_clip = "clip" in version.lower()
+        self.is_clip = is_clip
         self.max_length = max_length
         self.output_key = "pooler_output" if self.is_clip else "last_hidden_state"
         from transformers import (CLIPTextModel, CLIPTokenizer, T5EncoderModel,
