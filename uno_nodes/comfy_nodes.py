@@ -43,7 +43,7 @@ def custom_load_flux_model(model_path, device, use_fp8, lora_rank=512, lora_path
         print(f"Loading Flux model from {model_path}")
         print("Loading lora")
         lora_sd = load_sft(lora_path, device=str(device)) if lora_path.endswith("safetensors")\
-            else torch.load(lora_path, map_location='cpu')
+            else torch.load(lora_path, map_location='cpu', weights_only=False)
         print("Loading main checkpoint")
         if model_path.endswith('safetensors'):
             if use_fp8:
@@ -62,7 +62,7 @@ def custom_load_flux_model(model_path, device, use_fp8, lora_rank=512, lora_path
             sd.update(lora_sd)
             missing, unexpected = model.load_state_dict(sd, strict=False, assign=True)
         else:
-            dit_state = torch.load(model_path, map_location='cpu')
+            dit_state = torch.load(model_path, map_location='cpu', weights_only=False)
             sd = {}
             for k in dit_state.keys():
                 sd[k.replace('module.','')] = dit_state[k]
@@ -95,7 +95,7 @@ def custom_load_ae(ae_path, device):
         if ae_path.endswith('safetensors'):
             sd = load_sft(ae_path, device=str(device))
         else:
-            sd = torch.load(ae_path, map_location=str(device))
+            sd = torch.load(ae_path, map_location=str(device), weights_only=False)
         missing, unexpected = ae.load_state_dict(sd, strict=False, assign=True)
         if len(missing) > 0:
             print(f"Missing keys: {len(missing)}")
